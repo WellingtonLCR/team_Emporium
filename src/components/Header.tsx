@@ -70,6 +70,7 @@ export const Header = ({ onSearch }: HeaderProps) => {
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     onSearch(searchQuery.trim());
+    handleNavigateToSection('#products');
   };
 
   const handleSearchChange = (value: string) => {
