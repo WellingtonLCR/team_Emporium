@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useCart } from '@/contexts/CartContext';
 import { CartDrawer } from './CartDrawer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
@@ -20,6 +20,7 @@ export const Header = ({ onSearch }: HeaderProps) => {
   const [isAdminMobileOpen, setIsAdminMobileOpen] = useState(false);
   const { getCartItemsCount } = useCart();
   const { user, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const displayName = useMemo(() => {
     if (!user) return '';
@@ -41,6 +42,30 @@ export const Header = ({ onSearch }: HeaderProps) => {
     if (typeof window === 'undefined') return;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  const handleNavigateHome = useCallback(
+    (closeMenu = false) => {
+      navigate('/', { replace: false });
+      requestAnimationFrame(() => {
+        scrollToTop();
+      });
+      if (closeMenu) {
+        setIsMenuOpen(false);
+      }
+    },
+    [navigate, scrollToTop]
+  );
+
+  const handleNavigateToSection = useCallback(
+    (hash: string, closeMenu = false) => {
+      const formattedHash = hash.startsWith('#') ? hash : `#${hash}`;
+      navigate({ pathname: '/', hash: formattedHash });
+      if (closeMenu) {
+        setIsMenuOpen(false);
+      }
+    },
+    [navigate]
+  );
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -72,7 +97,10 @@ export const Header = ({ onSearch }: HeaderProps) => {
             {/* Logo */}
             <Link
               to="/"
-              onClick={scrollToTop}
+              onClick={(event) => {
+                event.preventDefault();
+                handleNavigateHome();
+              }}
               className="flex items-center focus:outline-none"
               aria-label="Ir para a página inicial"
             >
@@ -106,12 +134,22 @@ export const Header = ({ onSearch }: HeaderProps) => {
             <nav className="hidden md:flex items-center space-x-6">
               <Link
                 to="/"
-                onClick={scrollToTop}
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleNavigateHome();
+                }}
                 className="text-green-700 hover:text-green-800 font-medium"
               >
                 Início
               </Link>
-              <Link to="/#products" className="text-green-700 hover:text-green-800 font-medium">
+              <Link
+                to="/#products"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleNavigateToSection('#products');
+                }}
+                className="text-green-700 hover:text-green-800 font-medium"
+              >
                 Produtos
               </Link>
               {user ? (
@@ -213,15 +251,22 @@ export const Header = ({ onSearch }: HeaderProps) => {
             <div className="md:hidden pb-4 space-y-2">
               <Link
                 to="/"
-                onClick={() => {
-                  scrollToTop();
-                  setIsMenuOpen(false);
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleNavigateHome(true);
                 }}
                 className="block text-green-700 hover:text-green-800 font-medium py-2"
               >
                 Início
               </Link>
-              <Link to="/#products" className="block text-green-700 hover:text-green-800 font-medium py-2">
+              <Link
+                to="/#products"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleNavigateToSection('#products', true);
+                }}
+                className="block text-green-700 hover:text-green-800 font-medium py-2"
+              >
                 Produtos
               </Link>
               {user ? (
@@ -235,7 +280,7 @@ export const Header = ({ onSearch }: HeaderProps) => {
                         type="button"
                         onClick={() => setIsAdminMobileOpen((v) => !v)}
                         className="flex w-full items-center justify-between py-2 text-green-700 hover:text-green-800 font-medium"
-                        aria-expanded={isAdminMobileOpen ? 'true' : 'false'}
+                        aria-expanded={isAdminMobileOpen}
                         aria-haspopup="menu"
                         aria-controls="admin-mobile-menu"
                       >
