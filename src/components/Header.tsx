@@ -104,7 +104,11 @@ export const Header = ({ onSearch }: HeaderProps) => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link to="/" className="text-green-700 hover:text-green-800 font-medium">
+              <Link
+                to="/"
+                onClick={scrollToTop}
+                className="text-green-700 hover:text-green-800 font-medium"
+              >
                 Início
               </Link>
               <Link to="/#products" className="text-green-700 hover:text-green-800 font-medium">
@@ -207,7 +211,14 @@ export const Header = ({ onSearch }: HeaderProps) => {
           {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden pb-4 space-y-2">
-              <Link to="/" className="block text-green-700 hover:text-green-800 font-medium py-2">
+              <Link
+                to="/"
+                onClick={() => {
+                  scrollToTop();
+                  setIsMenuOpen(false);
+                }}
+                className="block text-green-700 hover:text-green-800 font-medium py-2"
+              >
                 Início
               </Link>
               <Link to="/#products" className="block text-green-700 hover:text-green-800 font-medium py-2">
